@@ -103,7 +103,7 @@ SplitSmart Pro provides a smart platform that:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/splitsmart-pro.git
+git clone https://github.com/your-username/splitsmartpro.git
 
 # Navigate to project
 cd splitsmart-pro
