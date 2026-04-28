@@ -8,3 +8,11 @@ export const getGroupBalance = async (groupId) => {
   const res = await api.get(`/balance/${groupId}`);
   return res.data;
 };
+
+/**
+ * Get total owed/owes summary for the user across all groups
+ */
+export const getUserSummary = async () => {
+  const res = await api.get('/balance/summary');
+  return res.data;
+};

@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Group from '../models/Group.js';
 import Expense from '../models/Expense.js';
+import Settlement from '../models/Settlement.js';
 import { computeNetBalances, simplifyDebts } from '../utils/simplifyDebts.js';
 
 /**
@@ -25,13 +26,16 @@ export const getGroupBalance = asyncHandler(async (req, res) => {
     throw new Error('Not a member of this group');
   }
 
-  // Fetch all expenses for this group (populated)
-  const expenses = await Expense.find({ groupId })
-    .populate('paidBy', 'name email')
-    .populate('splits.user', 'name email');
+  // Fetch all expenses and settlements for this group
+  const [expenses, settlements] = await Promise.all([
+    Expense.find({ groupId })
+      .populate('paidBy', 'name email')
+      .populate('splits.user', 'name email'),
+    Settlement.find({ groupId, status: 'completed' })
+  ]);
 
   // Compute net balances
-  const balanceMap = computeNetBalances(expenses);
+  const balanceMap = computeNetBalances(expenses, settlements);
 
   // Build per-user balance objects (include members with 0 balance too)
   const balances = group.members.map((member) => {
@@ -60,4 +64,44 @@ export const getGroupBalance = asyncHandler(async (req, res) => {
   }));
 
   res.json({ balances, simplifiedDebts });
+});
+
+/**
+ * GET /api/balance/summary
+ * Returns total owed to user and total user owes across ALL groups.
+ */
+export const getUserSummary = asyncHandler(async (req, res) => {
+  const userId = req.user._id.toString();
+  
+  // Find all groups user belongs to
+  const groups = await Group.find({ members: userId });
+  const groupIds = groups.map(g => g._id);
+
+  // Fetch all expenses and settlements for these groups
+  const [expenses, settlements] = await Promise.all([
+    Expense.find({ groupId: { $in: groupIds } }),
+    Settlement.find({ groupId: { $in: groupIds }, status: 'completed' })
+  ]);
+
+  // Aggregate by group to compute net balances
+  let totalOwedToUser = 0;
+  let totalUserOwes = 0;
+
+  for (const groupId of groupIds) {
+    const groupExpenses = expenses.filter(e => e.groupId.toString() === groupId.toString());
+    const groupSettlements = settlements.filter(s => s.groupId.toString() === groupId.toString());
+    
+    const balanceMap = computeNetBalances(groupExpenses, groupSettlements);
+    const userBalance = balanceMap.get(userId) || 0;
+
+    if (userBalance > 0) totalOwedToUser += userBalance;
+    if (userBalance < 0) totalUserOwes += Math.abs(userBalance);
+  }
+
+  res.json({
+    totalOwedToUser: Math.round(totalOwedToUser * 100) / 100,
+    totalUserOwes: Math.round(totalUserOwes * 100) / 100,
+    netBalance: Math.round((totalOwedToUser - totalUserOwes) * 100) / 100,
+    groupCount: groups.length
+  });
 });

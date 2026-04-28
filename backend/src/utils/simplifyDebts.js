@@ -1,31 +1,41 @@
 const round2 = (n) => Math.round(n * 100) / 100;
 
 /**
- * STEP 1: Compute net balance per user across all expenses.
+ * STEP 1: Compute net balance per user across all expenses and settlements.
  * Positive balance  → user is owed money (creditor)
  * Negative balance  → user owes money   (debtor)
  *
- * @param {Array} expenses  - populated expense documents
+ * @param {Array} expenses     - populated expense documents
+ * @param {Array} settlements  - populated settlement documents
  * @returns {Map<string, number>}  userId → netBalance
  */
-export function computeNetBalances(expenses) {
+export function computeNetBalances(expenses, settlements = []) {
   const balanceMap = new Map();
 
   const add = (id, amount) => {
     balanceMap.set(id, round2((balanceMap.get(id) || 0) + amount));
   };
 
+  // Expenses: payers gain credit, split members owe
   for (const expense of expenses) {
     const paidById = expense.paidBy?._id?.toString() || expense.paidBy?.toString();
-
-    // payer gains credit for the full amount
     add(paidById, expense.amount);
 
-    // each member in splits owes their share
     for (const split of expense.splits) {
       const userId = split.user?._id?.toString() || split.user?.toString();
       add(userId, -split.amount);
     }
+  }
+
+  // Settlements: payer's debt reduces (balance +), receiver's credit reduces (balance -)
+  for (const settlement of settlements) {
+    if (settlement.status !== 'completed') continue;
+    
+    const fromId = settlement.fromUser?._id?.toString() || settlement.fromUser?.toString();
+    const toId   = settlement.toUser?._id?.toString() || settlement.toUser?.toString();
+
+    add(fromId, settlement.amount);
+    add(toId, -settlement.amount);
   }
 
   return balanceMap;

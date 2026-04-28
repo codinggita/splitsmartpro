@@ -37,6 +37,11 @@ const expenseSchema = new mongoose.Schema(
       default: 'equal',
     },
     splits: [splitSchema],
+    category: {
+      type: String,
+      enum: ['Food', 'Travel', 'Shopping', 'Entertainment', 'Rent', 'Utilities', 'Others'],
+      default: 'Others',
+    },
   },
   { timestamps: true }
 );

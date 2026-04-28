@@ -16,6 +16,7 @@ export default function AddExpenseModal({ group, onClose, onAdded }) {
   const [paidBy, setPaidBy] = useState(group.members[0]?._id || '');
   const [splitType, setSplitType] = useState('equal');
   const [splits, setSplits] = useState([]);
+  const [category, setCategory] = useState('Others');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -68,7 +69,7 @@ export default function AddExpenseModal({ group, onClose, onAdded }) {
     if (!validate()) return;
     setLoading(true);
     try {
-      let payload = { groupId: group._id, title: title.trim(), amount: totalAmount, paidBy, splitType };
+      let payload = { groupId: group._id, title: title.trim(), amount: totalAmount, paidBy, splitType, category };
       if (splitType === 'custom') payload.splits = splits.map((s) => ({ user: s.user, amount: parseFloat(s.amount) }));
       if (splitType === 'percentage') payload.splits = splits.map((s) => ({ user: s.user, percentage: parseFloat(s.percentage) }));
       const expense = await createExpense(payload);
@@ -148,6 +149,23 @@ export default function AddExpenseModal({ group, onClose, onAdded }) {
               />
             </div>
             {errors.amount && <p className="text-rose-400 text-xs mt-1">{errors.amount}</p>}
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="block text-xs font-semibold text-[#94A3B8] mb-2 uppercase tracking-wider">Category</label>
+            <div className="relative">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-[#0F172A] border border-[#334155] text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all appearance-none cursor-pointer"
+              >
+                {['Food', 'Travel', 'Shopping', 'Entertainment', 'Rent', 'Utilities', 'Others'].map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#475569] pointer-events-none" />
+            </div>
           </div>
 
           {/* Paid By */}
