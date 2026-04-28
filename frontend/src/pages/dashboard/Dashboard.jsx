@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
 
 import StatCard from '../../components/dashboard/StatCard';
@@ -9,13 +9,24 @@ import ExpenseList from '../../components/dashboard/ExpenseList';
 import GroupList from '../../components/dashboard/GroupList';
 import ActivityFeed from '../../components/dashboard/ActivityFeed';
 import Insights from '../../components/dashboard/Insights';
+import { getUserSummary } from '../../services/balanceService.js';
 
 export default function Dashboard() {
+  const [summary, setSummary] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1500);
-    return () => clearTimeout(timer);
+    const fetchSummary = async () => {
+      try {
+        const data = await getUserSummary();
+        setSummary(data);
+      } catch (err) {
+        console.error('Failed to fetch summary:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSummary();
   }, []);
 
   if (isLoading) {
@@ -52,8 +63,11 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
             <p className="text-[#94A3B8] mt-1">Welcome back, here's what's happening with your finances.</p>
           </div>
-          <button className="flex items-center gap-2 text-xs font-bold text-[#64748B] uppercase tracking-widest bg-[#1E293B] border border-[#334155] rounded-xl px-4 py-2 hover:border-indigo-500/50 hover:text-[#F8FAFC] transition-all cursor-pointer group active:scale-95">
-            Last updated: <span className="text-indigo-400 ml-1 group-hover:text-indigo-300">2 mins ago</span>
+          <button 
+            onClick={() => window.location.reload()}
+            className="flex items-center gap-2 text-xs font-bold text-[#64748B] uppercase tracking-widest bg-[#1E293B] border border-[#334155] rounded-xl px-4 py-2 hover:border-indigo-500/50 hover:text-[#F8FAFC] transition-all cursor-pointer group active:scale-95"
+          >
+            Refresh Dashboard
             <svg className="w-3 h-3 ml-1 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
@@ -64,24 +78,24 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard 
             title="Total Balance" 
-            amount={124500} 
-            type="neutral" 
-            trend="+12%" 
-            description="Across all accounts"
+            amount={summary?.netBalance || 0} 
+            type={summary?.netBalance >= 0 ? 'positive' : 'negative'}
+            trend={summary?.netBalance >= 0 ? 'Stable' : 'Owed'} 
+            description="Across all groups"
           />
           <StatCard 
             title="You Are Owed" 
-            amount={45800} 
+            amount={summary?.totalOwedToUser || 0} 
             type="positive" 
-            trend="+5.4%" 
-            description="From 8 people"
+            trend="Collect" 
+            description={`From ${summary?.groupCount || 0} groups`}
           />
           <StatCard 
             title="You Owe" 
-            amount={12400} 
+            amount={summary?.totalUserOwes || 0} 
             type="negative" 
-            trend="-2.1%" 
-            description="To 3 people"
+            trend="To Pay" 
+            description="Pending settlements"
           />
           <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl p-6 shadow-xl shadow-indigo-500/20 flex flex-col justify-between group cursor-pointer hover:scale-[1.02] hover:shadow-indigo-500/40 active:scale-[0.98] transition-all">
              <div className="flex justify-between items-start">
@@ -93,8 +107,8 @@ export default function Dashboard() {
                <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-1 rounded text-white">Pro Plan</span>
              </div>
              <div>
-               <p className="text-indigo-100 text-xs font-bold mb-1 uppercase tracking-wider">Estimated Savings</p>
-               <h3 className="text-2xl font-bold text-white">₹8,200</h3>
+               <p className="text-indigo-100 text-xs font-bold mb-1 uppercase tracking-wider">Active Groups</p>
+               <h3 className="text-2xl font-bold text-white">{summary?.groupCount || 0}</h3>
              </div>
           </div>
         </div>
@@ -133,10 +147,13 @@ export default function Dashboard() {
               <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all" />
               <h4 className="text-sm font-bold text-white mb-2 relative z-10">Smart Split™ Enabled</h4>
               <p className="text-xs text-[#94A3B8] leading-relaxed relative z-10">
-                Our algorithm just simplified 4 debts across your groups, saving you 2 transactions.
+                Our algorithm just simplified debts across your groups, saving you transactions.
               </p>
-              <button className="mt-4 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1 group/btn">
-                View Optimization Report <ChevronRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
+              <button 
+                onClick={() => navigate('/groups')}
+                className="mt-4 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1 group/btn"
+              >
+                View Your Groups <ChevronRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>

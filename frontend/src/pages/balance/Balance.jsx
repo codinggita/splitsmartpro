@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar.jsx';
 import BalanceCard from '../../components/balance/BalanceCard.jsx';
+import SettleModal from '../../components/settlement/SettleModal.jsx';
 import { getGroupBalance } from '../../services/balanceService.js';
 import { toast } from '../../components/common/Toast.jsx';
 
@@ -30,6 +31,7 @@ export default function Balance() {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
   const [tab, setTab]         = useState('balances'); // 'balances' | 'settlements'
+  const [activeSettlement, setActiveSettlement] = useState(null);
 
   const currentUserId = (() => {
     try { return JSON.parse(localStorage.getItem('user') || '{}')._id; }
@@ -115,13 +117,21 @@ export default function Balance() {
               <p className="text-[#64748B] text-xs">Who owes whom in this group</p>
             </div>
           </div>
-          <button
-            onClick={fetchBalance}
-            className="p-2.5 rounded-xl border border-[#334155] text-[#64748B] hover:text-white hover:bg-[#334155] transition-all active:scale-95"
-            title="Refresh"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate(`/settle/${groupId}`)}
+              className="px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500 transition-all active:scale-95 shadow-lg shadow-emerald-500/20 flex items-center gap-1.5"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" /> Settle Up
+            </button>
+            <button
+              onClick={fetchBalance}
+              className="p-2.5 rounded-xl border border-[#334155] text-[#64748B] hover:text-white hover:bg-[#334155] transition-all active:scale-95"
+              title="Refresh"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* YOUR SUMMARY ─────────────────────────── */}
@@ -146,7 +156,13 @@ export default function Balance() {
               <div className="mt-4 space-y-2">
                 <p className="text-xs font-bold text-[#64748B] uppercase tracking-widest mb-2">Your Actions</p>
                 {mySettlements.map((s, i) => (
-                  <BalanceCard key={i} mode="settlement" {...s} currentUserId={currentUserId} />
+                  <BalanceCard 
+                    key={i} 
+                    mode="settlement" 
+                    {...s} 
+                    currentUserId={currentUserId} 
+                    onSettle={() => setActiveSettlement(s)}
+                  />
                 ))}
               </div>
             )}
@@ -204,7 +220,13 @@ export default function Balance() {
                   {data.simplifiedDebts.length} transaction{data.simplifiedDebts.length !== 1 ? 's' : ''} needed to settle all debts.
                 </p>
                 {data.simplifiedDebts.map((s, i) => (
-                  <BalanceCard key={i} mode="settlement" {...s} currentUserId={currentUserId} />
+                  <BalanceCard 
+                    key={i} 
+                    mode="settlement" 
+                    {...s} 
+                    currentUserId={currentUserId} 
+                    onSettle={() => setActiveSettlement(s)}
+                  />
                 ))}
               </>
             )}
@@ -221,6 +243,16 @@ export default function Balance() {
           </Link>
         </div>
       </main>
+
+      {/* Confirmation Modal */}
+      {activeSettlement && (
+        <SettleModal
+          settlement={activeSettlement}
+          groupId={groupId}
+          onClose={() => setActiveSettlement(null)}
+          onSettled={fetchBalance}
+        />
+      )}
     </div>
   );
 }

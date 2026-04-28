@@ -5,6 +5,7 @@ import Dashboard from './pages/dashboard/Dashboard.jsx';
 import Groups from './pages/group/Groups.jsx';
 import GroupDetail from './pages/group/GroupDetail.jsx';
 import Balance from './pages/balance/Balance.jsx';
+import Settle from './pages/settlement/Settle.jsx';
 import ToastProvider from './components/common/Toast.jsx';
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/groups"       element={<Groups />} />
         <Route path="/groups/:id"   element={<GroupDetail />} />
         <Route path="/balance/:groupId" element={<Balance />} />
+        <Route path="/settle/:groupId"  element={<Settle />} />
       </Routes>
 
       {/* Global toast notification system */}

@@ -64,7 +64,7 @@ function NetBalanceCard({ user, netBalance, isCurrentUser }) {
 }
 
 /* ── Settlement Suggestion Card ───────────────────────────── */
-function SettlementCard({ from, to, amount, currentUserId }) {
+function SettlementCard({ from, to, amount, currentUserId, onSettle }) {
   const youPay     = from._id === currentUserId;
   const youReceive = to._id   === currentUserId;
 
@@ -72,13 +72,13 @@ function SettlementCard({ from, to, amount, currentUserId }) {
 
   if (youPay) {
     heading     = `Pay ${to.name}`;
-    subtext     = `You owe this person ₹${amount.toFixed(2)}`;
+    subtext     = `You owe ₹${amount.toFixed(2)}`;
     borderColor = 'border-rose-500/25';
     bg          = 'bg-rose-500/5';
     amountColor = 'text-rose-300';
   } else if (youReceive) {
     heading     = `Collect from ${from.name}`;
-    subtext     = `${from.name} owes you ₹${amount.toFixed(2)}`;
+    subtext     = `Owes you ₹${amount.toFixed(2)}`;
     borderColor = 'border-emerald-500/25';
     bg          = 'bg-emerald-500/5';
     amountColor = 'text-emerald-300';
@@ -96,7 +96,21 @@ function SettlementCard({ from, to, amount, currentUserId }) {
         <p className="text-sm font-bold text-white">{heading}</p>
         <p className="text-xs text-[#64748B] mt-0.5">{subtext}</p>
       </div>
-      <p className={`text-base font-bold shrink-0 ${amountColor}`}>₹{amount.toFixed(2)}</p>
+      
+      <div className="flex items-center gap-4 shrink-0">
+        <p className={`text-base font-bold ${amountColor}`}>₹{amount.toFixed(2)}</p>
+        {onSettle && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onSettle();
+            }}
+            className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-indigo-500 transition-all active:scale-95 shadow-lg shadow-indigo-500/20"
+          >
+            Settle
+          </button>
+        )}
+      </div>
     </div>
   );
 }

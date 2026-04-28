@@ -5,6 +5,8 @@ import authRoutes from './routes/authRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import balanceRoutes from './routes/balanceRoutes.js';
+import settlementRoutes from './routes/settlementRoutes.js';
+import insightRoutes from './routes/insightRoutes.js';
 
 const app = express();
 
@@ -19,6 +21,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/balance', balanceRoutes);
+app.use('/api/settlements', settlementRoutes);
+app.use('/api/insights', insightRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
