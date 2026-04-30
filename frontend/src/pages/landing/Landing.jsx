@@ -27,6 +27,7 @@ function Navbar() {
           <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
           <a href="#security" className="hover:text-white transition-colors">Security</a>
           <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+          <Link to="/pro" className="hover:text-indigo-400 font-bold transition-colors">Pro Plan</Link>
         </div>
 
         <div className="flex items-center gap-4">
@@ -283,7 +284,7 @@ const verifyEncryption = async (payload) => {
               <ul className="space-y-4 mb-8">
                 {['Unlimited groups', 'Advanced analytics & charts', 'Multi-currency support', 'Priority support'].map((item, i) => <li key={i} className="flex gap-2 text-sm"><IconCheck/> {item}</li>)}
               </ul>
-              <Link to="/login" className="block text-center w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-colors">Go Pro</Link>
+              <Link to="/pro" className="block text-center w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-colors">Go Pro</Link>
             </div>
 
             {/* Team */}

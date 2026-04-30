@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   User, Mail, Globe, Moon, Bell, Lock, LogOut, 
-  ChevronRight, Camera, ShieldCheck, Sun, CheckCircle2 
+  ChevronRight, Camera, ShieldCheck, Sun, CheckCircle2, Star, Zap
 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar.jsx';
 
@@ -28,14 +28,18 @@ export default function Settings() {
     window.location.href = '/login';
   };
 
-  const saveSettings = () => {
-    setSaving(true);
-    localStorage.setItem('splitsmart_theme', theme);
-    if (theme === 'light') {
+  const handleThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    localStorage.setItem('splitsmart_theme', newTheme);
+    if (newTheme === 'light') {
       document.documentElement.classList.add('light-theme');
     } else {
       document.documentElement.classList.remove('light-theme');
     }
+  };
+
+  const saveSettings = () => {
+    setSaving(true);
     setTimeout(() => setSaving(false), 800);
   };
 
@@ -78,6 +82,30 @@ export default function Settings() {
           {/* Right Content Area */}
           <div className="md:col-span-8 space-y-6">
             
+            {/* Subscription Section */}
+            <section className="p-6 rounded-3xl bg-gradient-to-br from-[#1e1c4b] to-[#1E293B] border border-indigo-500/30 shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-50">
+                <Zap className="w-24 h-24 text-indigo-400 blur-2xl absolute -top-4 -right-4" />
+              </div>
+              <div className="relative z-10">
+                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-widest mb-2 flex items-center gap-2">
+                  <Star className="w-4 h-4" /> Subscription
+                </h3>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6">
+                  <div>
+                    <h4 className="text-xl font-bold text-white mb-1">SplitSmart Basic</h4>
+                    <p className="text-sm text-indigo-200/70">Upgrade to Pro for advanced analytics and AI insights.</p>
+                  </div>
+                  <button 
+                    onClick={() => navigate('/pro')}
+                    className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2 shrink-0"
+                  >
+                    <Zap className="w-4 h-4" /> Upgrade to Pro
+                  </button>
+                </div>
+              </div>
+            </section>
+
             {/* Preferences Section */}
             <section className="p-6 rounded-3xl bg-[#1E293B] border border-[#334155] shadow-lg">
               <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-2">
@@ -113,13 +141,13 @@ export default function Settings() {
                   </div>
                   <div className="flex items-center p-1 rounded-xl bg-[#0F172A] border border-[#334155]">
                     <button 
-                      onClick={() => setTheme('light')}
+                      onClick={() => handleThemeChange('light')}
                       className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${theme === 'light' ? 'bg-[#1E293B] text-white shadow-sm' : 'text-[#64748B] hover:text-[#94A3B8]'}`}
                     >
                       <Sun className="w-4 h-4" /> Light
                     </button>
                     <button 
-                      onClick={() => setTheme('dark')}
+                      onClick={() => handleThemeChange('dark')}
                       className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${theme === 'dark' ? 'bg-[#1E293B] text-indigo-400 shadow-sm border border-indigo-500/30' : 'text-[#64748B] hover:text-[#94A3B8]'}`}
                     >
                       <Moon className="w-4 h-4" /> Dark

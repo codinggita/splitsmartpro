@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, LineChart } from 'lucide-react';
+import { LayoutDashboard, Users, LineChart, Zap } from 'lucide-react';
 import NotificationPanel from './NotificationPanel.jsx';
 
 export default function Navbar() {
@@ -41,6 +41,7 @@ export default function Navbar() {
           {navLink('/dashboard', 'Dashboard', LayoutDashboard)}
           {navLink('/groups', 'Groups', Users)}
           {navLink('/analytics', 'Analytics', LineChart)}
+          {navLink('/pro', 'Pro Plan', Zap)}
         </div>
         
         {/* User Profile / Notifications */}
