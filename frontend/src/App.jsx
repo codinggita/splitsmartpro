@@ -10,6 +10,7 @@ import Settle from './pages/settlement/Settle.jsx';
 import Analytics from './pages/analytics/Analytics.jsx';
 import Settings from './pages/settings/Settings.jsx';
 import ProPlan from './pages/pro/ProPlan.jsx';
+import BottomNav from './components/layout/BottomNav.jsx';
 import ToastProvider from './components/common/Toast.jsx';
 
 export default function App() {
@@ -23,7 +24,7 @@ export default function App() {
   }, []);
 
   return (
-    <>
+    <div className="pb-20 sm:pb-0">
       <Routes>
         <Route path="/"             element={<Landing />} />
         <Route path="/login"        element={<Login />} />
@@ -37,9 +38,11 @@ export default function App() {
         <Route path="/pro"              element={<ProPlan />} />
       </Routes>
 
+      <BottomNav />
+
       {/* Global toast notification system */}
       <ToastProvider />
-    </>
+    </div>
   );
 }
 
