@@ -6,6 +6,9 @@ import CreateGroupModal from '../../components/group/CreateGroupModal.jsx';
 import JoinGroupModal from '../../components/group/JoinGroupModal.jsx';
 import { getGroups } from '../../services/groupService.js';
 import { toast } from '../../components/common/Toast.jsx';
+import { useDebounce } from '../../hooks/useDebounce.js';
+import PageSEO from '../../components/common/PageSEO.jsx';
+import { trackPageView } from '../../utils/analytics.js';
 
 function EmptyState({ onCreate, onJoin }) {
   return (
@@ -50,6 +53,7 @@ export default function Groups() {
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 350);
 
   const currentUserId = (() => {
     try {
@@ -73,6 +77,8 @@ export default function Groups() {
 
   useEffect(() => { fetchGroups(); }, [fetchGroups]);
 
+  useEffect(() => { trackPageView('/groups', 'Groups | SplitSmart Pro'); }, []);
+
   const handleGroupCreated = (newGroup) => {
     setGroups((prev) => [newGroup, ...prev]);
   };
@@ -85,12 +91,13 @@ export default function Groups() {
   };
 
   const filtered = groups.filter((g) =>
-    g.name.toLowerCase().includes(search.toLowerCase()) ||
-    (g.description || '').toLowerCase().includes(search.toLowerCase())
+    g.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    (g.description || '').toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC] font-sans pb-16">
+      <PageSEO title="Groups" description="Create and manage your expense groups for trips, roommates, and teams." path="/groups" />
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-6 pt-24">

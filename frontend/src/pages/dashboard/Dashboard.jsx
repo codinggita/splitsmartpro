@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ChevronRight, Loader2 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
+import PageSEO from '../../components/common/PageSEO.jsx';
 
 import StatCard from '../../components/dashboard/StatCard';
 import QuickActions from '../../components/dashboard/QuickActions';
@@ -16,6 +17,7 @@ import AddExpenseModal from '../../components/expense/AddExpenseModal.jsx';
 import SelectGroupModal from '../../components/dashboard/SelectGroupModal.jsx';
 import { toast } from '../../components/common/Toast.jsx';
 import { useNavigate } from 'react-router-dom';
+import { trackPageView } from '../../utils/analytics.js';
 
 export default function Dashboard() {
   const [summary, setSummary] = useState(null);
@@ -29,6 +31,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    trackPageView('/dashboard', 'Dashboard | SplitSmart Pro');
     const fetchData = async () => {
       try {
         const [summaryData, groupsData] = await Promise.all([
@@ -95,6 +98,11 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC] font-sans pb-12">
+      <PageSEO
+        title="Dashboard"
+        description="Track your shared expenses, balances, and group activity in real-time."
+        path="/dashboard"
+      />
       <Navbar />
       
       <main className="max-w-7xl mx-auto px-6 pt-24">

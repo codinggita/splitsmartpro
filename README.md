@@ -1,182 +1,220 @@
 # 💸 SplitSmart Pro
 
-A modern **fintech expense splitting web application** that helps users split expenses, track balances, and settle payments effortlessly across groups.
+> A production-ready, full-stack **fintech expense-splitting platform** built with React, Node.js, Express, and MongoDB. Track, split, and settle shared expenses effortlessly across groups.
 
-Built with a **dark-themed SaaS UI**, SplitSmart Pro delivers a smooth, intuitive experience for managing shared expenses in real life—trips, roommates, office teams, and more.
+[![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-18.x-61DAFB?logo=react)](https://reactjs.org/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.x-38BDF8?logo=tailwindcss)](https://tailwindcss.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-339933?logo=node.js)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb)](https://mongodb.com/)
 
 ---
 
 ## 🚀 Features
 
-### 🌐 Core Flow
-- Landing page with product introduction
-- Secure authentication (Login / Signup)
-- Interactive dashboard
-- Group creation & management
-- Expense splitting system
-- Balance tracking & settlement system
+### Core
+- 🌐 **Landing Page** – Conversion-optimised SaaS marketing page
+- 🔐 **Authentication** – JWT-based login / signup with bcrypt
+- 🏠 **Dashboard** – Real-time balance summary, quick actions, analytics
+- 👥 **Group Management** – Create/join groups with invite codes
+- 💸 **Expense Splitting** – Equal, exact, or percentage-based splits
+- ⚖️ **Settle Up** – Simplified debt settlement flow
+- 📊 **Analytics** – Monthly trends, category breakdown, AI insights
+- ⚙️ **Settings** – Theme, currency, notifications, security
+
+### Technical Highlights
+- ⚡ **Code splitting** – All pages lazy-loaded via React Suspense
+- 🛡️ **Protected routes** – Auth guards with redirect-back support
+- 🔁 **API retry** – Automatic retry on 5xx / network failures (2 attempts)
+- 🌍 **Dynamic currency** – Switch between INR, USD, EUR, GBP globally
+- 🌓 **Dark / Light mode** – Persisted in `localStorage`
+- 🔔 **Toast notifications** – Success, error, info feedback
+- 📱 **Mobile-first** – Bottom navigation, responsive layout
 
 ---
 
-### 👥 Group Management
-- Create and manage multiple groups
-- Add/remove members easily
-- Group-specific expense tracking
-- Activity feed for transparency
+## 🧠 Tech Stack
+
+| Layer       | Technology                                    |
+|-------------|-----------------------------------------------|
+| Frontend    | React 18, Vite 5, Tailwind CSS 3              |
+| Routing     | React Router DOM 6 (lazy + protected routes)  |
+| State       | React hooks (useState, useEffect, useCallback)|
+| API Client  | Axios (interceptors, retry, auto-logout)      |
+| Charts      | Recharts                                      |
+| Animations  | Framer Motion                                 |
+| SEO         | react-helmet-async                            |
+| Backend     | Node.js, Express.js                           |
+| Database    | MongoDB + Mongoose                            |
+| Auth        | JWT + bcrypt                                  |
 
 ---
 
-### 💸 Expense System
-- Add shared expenses
-- Split equally, exactly, or by percentage
-- Track who paid and who owes
-- Real-time balance updates
+## 📁 Folder Structure
+
+```
+split/
+├── frontend/
+│   ├── index.html              # Full SEO + OG meta tags
+│   └── src/
+│       ├── App.jsx             # Root – ErrorBoundary + routes
+│       ├── main.jsx            # Entry – HelmetProvider + BrowserRouter
+│       ├── routes/
+│       │   └── AppRoutes.jsx   # Lazy routes + ProtectedRoute guards
+│       ├── components/
+│       │   ├── common/         # Button, Input, Modal, Toast, PageSEO,
+│       │   │                   # ErrorBoundary, ProtectedRoute
+│       │   ├── layout/         # Navbar, BottomNav, NotificationPanel
+│       │   ├── dashboard/      # StatCard, ExpenseList, AnalyticsChart…
+│       │   ├── expense/        # ExpenseCard, AddExpenseModal
+│       │   ├── group/          # GroupCard, CreateGroupModal…
+│       │   ├── balance/        # BalanceCard
+│       │   └── settlement/     # Settlement components
+│       ├── pages/
+│       │   ├── landing/        # Landing.jsx
+│       │   ├── auth/           # Login.jsx
+│       │   ├── dashboard/      # Dashboard.jsx
+│       │   ├── group/          # Groups.jsx, GroupDetail.jsx
+│       │   ├── balance/        # Balance.jsx
+│       │   ├── settlement/     # Settle.jsx
+│       │   ├── analytics/      # Analytics.jsx
+│       │   ├── settings/       # Settings.jsx
+│       │   └── pro/            # ProPlan.jsx
+│       ├── hooks/
+│       │   ├── useAuth.js      # Auth state + login/logout
+│       │   ├── useTheme.js     # Dark/light mode management
+│       │   ├── useDebounce.js  # Input debouncing
+│       │   └── useFetch.js     # Generic data-fetching
+│       ├── services/
+│       │   ├── api.js          # Axios instance (interceptors + retry)
+│       │   ├── authService.js
+│       │   ├── groupService.js
+│       │   ├── expenseService.js
+│       │   ├── balanceService.js
+│       │   └── settlementService.js
+│       └── utils/
+│           ├── currencyUtils.js  # Dynamic currency formatting
+│           ├── storageUtils.js   # Safe localStorage/sessionStorage helpers
+│           ├── analytics.js      # GA4 page-view & event tracking
+│           ├── splitLogic.js     # Expense split calculations
+│           └── cn.js             # Tailwind class merger
+└── backend/
+    └── src/
+        ├── server.js
+        ├── models/             # User, Group, Expense, Settlement
+        ├── routes/             # Auth, Group, Expense, Balance, Settlement
+        ├── controllers/
+        └── middleware/         # Auth middleware, error handler
+```
 
 ---
 
-### ⚖️ Settle Up System
-- View net balances (you owe / you get)
-- Settle payments with users
-- Mark payments as UPI, cash, or manual
-- Settlement history tracking
+## 📦 Installation & Setup
 
----
+### Prerequisites
+- Node.js ≥ 18
+- MongoDB (Atlas or local)
 
-### 📊 Insights & Analytics
-- Monthly spending trends
-- Category-based expense breakdown
-- Smart insights (e.g., spending patterns)
-
----
-
-### 🔔 Notifications (Optional/Planned)
-- Expense added alerts
-- Settlement updates
-- Group activity notifications
-
----
-
-## 🧠 Tech Stack (Suggested)
-
-### Frontend
-- React.js
-- Tailwind CSS
-- Framer Motion (animations)
-- Chart.js / Recharts (analytics)
-
-### Backend
-- Node.js
-- Express.js
-- MongoDB
-
-### Authentication
-- JWT (JSON Web Token)
-- bcrypt for password encryption
-
----
-
-## 🎨 UI Design System
-
-- **Theme:** Dark SaaS UI
-- **Style:** Glassmorphism + Neon accents
-- **Primary Color:** `#4F7CFF`
-- **Background:** `#0B0F1A`
-- **Success:** `#2EE59D`
-- **Error:** `#FF5A5F`
-- **Font:** Inter / SF Pro
-
----
-
-## 📱 Pages Overview
-
-1. 🌐 Landing Page
-2. 🔐 Login Page
-3. 📝 Signup Page
-4. 🏠 Dashboard
-5. 👥 Group Page
-6. 💸 Add Expense Page / Modal
-7. ⚖️ Balance Page
-8. 💳 Settle Up Page
-9. 📊 Insights Page
-
----
-
-## 🔄 User Flow
-
----
-
-## 🧩 Key Features in Detail
-
-### 💰 Smart Balance Calculation
-Automatically calculates:
-- Who owes whom
-- Net settlement amount
-- Minimal transaction optimization (optional upgrade)
-
----
-
-### 👥 Group Expense Splitting
-Supports:
-- Equal split
-- Exact amount split
-- Percentage-based split
-
----
-
-### 💳 Settle Up System
-- Mark payments as completed
-- UPI / cash / manual settlement options
-- Transaction history tracking
-
----
-
-## 📊 Future Enhancements
-
-- UPI payment integration
-- AI-based spending insights
-- Auto-settlement optimization
-- Mobile app (React Native)
-- Recurring expenses (rent, subscriptions)
-- Export reports (PDF/CSV)
-
----
-
-## 🖥️ UI Highlights
-
-- Fully responsive (desktop + tablet ready)
-- Glassmorphism UI cards
-- Smooth animations & transitions
-- Floating action buttons
-- Modern fintech dashboard layout
-
----
-
-## 📸 Screens Included
-
-- Landing Page
-- Authentication Flow
-- Dashboard Overview
-- Group Management
-- Expense Creation
-- Balance Tracking
-- Settle Up Screen
-- Insights Dashboard
-
----
-
-## 🛠️ Installation (Example)
+### 1. Clone the repository
 
 ```bash
-# Clone repo
-git clone https://github.com/your-username/splitsmart-pro.git
+git clone https://github.com/VishwaPatel892/splitsmartpro.git
+cd splitsmartpro
+```
 
-# Install dependencies
+### 2. Install root dependencies (runs both servers)
+
+```bash
 npm install
+```
 
-# Start frontend
-npm run dev
+### 3. Configure environment variables
 
-# Start backend (if applicable)
-cd backend
-npm install
-npm run server
+Create `backend/.env`:
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret_key
+```
+
+Create `frontend/.env` (optional):
+```env
+VITE_GA_ID=G-XXXXXXXXXX   # Google Analytics 4 Measurement ID
+```
+
+### 4. Run development servers
+
+```bash
+npm run dev        # Starts both frontend (5173) and backend (5000)
+```
+
+Or individually:
+```bash
+# Frontend
+cd frontend && npm run dev
+
+# Backend
+cd backend && npm run server
+```
+
+---
+
+## 🌐 Pages
+
+| Route              | Page             | Auth Required |
+|--------------------|------------------|---------------|
+| `/`                | Landing          | ❌            |
+| `/login`           | Login / Signup   | ❌            |
+| `/pro`             | Pro Plan         | ❌            |
+| `/dashboard`       | Dashboard        | ✅            |
+| `/groups`          | Groups           | ✅            |
+| `/groups/:id`      | Group Detail     | ✅            |
+| `/balance/:id`     | Balance          | ✅            |
+| `/settle/:id`      | Settle Up        | ✅            |
+| `/analytics`       | Analytics        | ✅            |
+| `/settings`        | Settings         | ✅            |
+
+---
+
+## 🔧 Key Implementation Details
+
+### Protected Routes
+All authenticated pages use a `ProtectedRoute` guard that reads the JWT from `localStorage`. Unauthenticated users are redirected to `/login` with the original URL preserved for post-login redirect.
+
+### API Layer
+- Axios with request interceptor to attach Bearer token
+- Response interceptor: normalises errors, auto-redirects on 401, retries 5xx/network failures up to 2 times
+
+### Storage Strategy
+| Data                  | Storage       |
+|-----------------------|---------------|
+| Auth token + user     | `localStorage`|
+| Theme preference      | `localStorage`|
+| Currency preference   | `localStorage`|
+| Multi-step form step  | `sessionStorage`|
+| Temporary filters     | `sessionStorage`|
+
+### Custom Hooks
+| Hook            | Purpose                              |
+|-----------------|--------------------------------------|
+| `useAuth`       | Login, logout, isAuthenticated       |
+| `useTheme`      | Toggle dark/light mode               |
+| `useDebounce`   | Debounce search/filter inputs        |
+| `useFetch`      | Generic async data fetching          |
+
+---
+
+## 📈 Future Roadmap
+
+- [ ] UPI / Stripe payment integration
+- [ ] Push notifications (Web Push API)
+- [ ] Export reports (PDF / CSV)
+- [ ] Recurring expenses
+- [ ] React Native mobile app
+- [ ] AI-powered spending insights
+
+---
+
+## 📄 License
+
+MIT © 2025 SplitSmart Pro
