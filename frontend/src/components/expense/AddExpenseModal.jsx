@@ -1,9 +1,13 @@
 import { formatCurrency, getCurrencySymbol } from '../../utils/currencyUtils.js';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, Receipt, DollarSign, User, Loader2, ChevronDown, Sparkles } from 'lucide-react';
 import { createExpense } from '../../services/expenseService.js';
 import { toast } from '../common/Toast.jsx';
 import { equalSplit } from '../../utils/splitLogic.js';
+import { ss } from '../../utils/storageUtils.js';
+import { trackEvent } from '../../utils/analytics.js';
+
+const DRAFT_KEY = 'ss_add_expense_draft';
 
 const SPLIT_TYPES = [
   { value: 'equal', label: 'Equal', desc: 'Divide equally' },
@@ -19,14 +23,22 @@ const SMART_SUGGESTIONS = [
 ];
 
 export default function AddExpenseModal({ group, onClose, onAdded }) {
-  const [title, setTitle] = useState('');
-  const [amount, setAmount] = useState('');
-  const [paidBy, setPaidBy] = useState(group.members[0]?._id || '');
-  const [splitType, setSplitType] = useState('equal');
-  const [splits, setSplits] = useState([]);
-  const [category, setCategory] = useState('Others');
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  // Restore draft from sessionStorage
+  const draft = ss.get(DRAFT_KEY, {});
+
+  const [title, setTitle]       = useState(draft.title    || '');
+  const [amount, setAmount]     = useState(draft.amount   || '');
+  const [paidBy, setPaidBy]     = useState(draft.paidBy   || group.members[0]?._id || '');
+  const [splitType, setSplitType] = useState(draft.splitType || 'equal');
+  const [splits, setSplits]     = useState([]);
+  const [category, setCategory] = useState(draft.category || 'Others');
+  const [loading, setLoading]   = useState(false);
+  const [errors, setErrors]     = useState({});
+
+  // Persist draft to sessionStorage on every field change
+  useEffect(() => {
+    ss.set(DRAFT_KEY, { title, amount, paidBy, splitType, category });
+  }, [title, amount, paidBy, splitType, category]);
 
   const members = group.members;
   const totalAmount = parseFloat(amount) || 0;
@@ -82,6 +94,8 @@ export default function AddExpenseModal({ group, onClose, onAdded }) {
       if (splitType === 'custom') payload.splits = splits.map((s) => ({ user: s.user, amount: parseFloat(s.amount) }));
       if (splitType === 'percentage') payload.splits = splits.map((s) => ({ user: s.user, percentage: parseFloat(s.percentage) }));
       const expense = await createExpense(payload);
+      trackEvent('Expense', 'Added', category, totalAmount);
+      ss.remove(DRAFT_KEY); // clear draft on success
       toast('Expense added!', 'success');
       onAdded(expense);
       onClose();
@@ -112,7 +126,7 @@ export default function AddExpenseModal({ group, onClose, onAdded }) {
               <p className="text-[#64748B] text-xs font-medium">{group.name}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-xl text-[#64748B] hover:text-white hover:bg-[#334155] transition-all active:scale-95">
+          <button onClick={() => { ss.remove(DRAFT_KEY); onClose(); }} className="p-1.5 rounded-xl text-[#64748B] hover:text-white hover:bg-[#334155] transition-all active:scale-95">
             <X className="w-5 h-5" />
           </button>
         </div>

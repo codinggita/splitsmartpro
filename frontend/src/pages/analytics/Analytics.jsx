@@ -9,6 +9,8 @@ import {
   Filter, ChevronDown, Activity, Sparkles 
 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar.jsx';
+import PageSEO from '../../components/common/PageSEO.jsx';
+import { trackPageView } from '../../utils/analytics.js';
 
 // --- Dummy Data ---
 const MONTHLY_DATA = [
@@ -36,14 +38,15 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading data
+    trackPageView('/analytics', 'Analytics | SplitSmart Pro');
     const timer = setTimeout(() => setLoading(false), 800);
     return () => clearTimeout(timer);
   }, [timeRange, selectedGroup]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0F172A] font-sans">
+      <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC] font-sans pb-24">
+        <PageSEO title="Analytics" description="Deep dive into your financial habits with advanced charts and AI insights." path="/analytics" />
         <Navbar />
         <div className="max-w-6xl mx-auto px-6 pt-28 space-y-6">
           <div className="h-10 w-48 bg-[#1E293B] rounded animate-pulse" />

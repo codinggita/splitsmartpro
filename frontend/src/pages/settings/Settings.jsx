@@ -1,13 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   User, Mail, Globe, Moon, Bell, Lock, LogOut, 
   ChevronRight, Camera, ShieldCheck, Sun, CheckCircle2, Star, Zap
 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar.jsx';
+import PageSEO from '../../components/common/PageSEO.jsx';
+import { trackPageView } from '../../utils/analytics.js';
 
 export default function Settings() {
   const navigate = useNavigate();
+
+  useEffect(() => { trackPageView('/settings', 'Settings | SplitSmart Pro'); }, []);
   
   const user = (() => {
     try { return JSON.parse(localStorage.getItem('splitsmart_user') || localStorage.getItem('user') || '{}'); }
@@ -52,6 +56,7 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC] font-sans pb-24">
+      <PageSEO title="Settings" description="Manage your account, theme, currency and notification preferences." path="/settings" />
       <Navbar />
 
       <main className="max-w-4xl mx-auto px-6 pt-28">
