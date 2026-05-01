@@ -43,3 +43,13 @@ export const deleteGroup = async (id) => {
   const res = await api.delete(`/groups/${id}`);
   return res.data;
 };
+
+/**
+ * Mark a group as settled or active
+ * @param {string} id
+ * @param {'settled'|'active'} status
+ */
+export const markGroupAsSettled = async (id, status = 'settled') => {
+  const res = await api.patch(`/groups/${id}/settle`, { status });
+  return res.data;
+};

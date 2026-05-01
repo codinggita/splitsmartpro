@@ -29,6 +29,11 @@ const groupSchema = new mongoose.Schema(
       unique: true,
       default: () => nanoid(10),
     },
+    status: {
+      type: String,
+      enum: ['active', 'settled'],
+      default: 'active',
+    },
   },
   { timestamps: true }
 );

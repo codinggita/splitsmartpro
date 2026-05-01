@@ -6,6 +6,7 @@ import {
   getGroupById,
   joinGroup,
   deleteGroup,
+  markGroupAsSettled,
 } from '../controllers/groupController.js';
 
 const router = express.Router();
@@ -20,5 +21,8 @@ router.route('/join')
 router.route('/:id')
   .get(protect, getGroupById)
   .delete(protect, deleteGroup);
+
+router.route('/:id/settle')
+  .patch(protect, markGroupAsSettled);
 
 export default router;

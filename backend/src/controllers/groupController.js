@@ -113,3 +113,32 @@ export const deleteGroup = asyncHandler(async (req, res) => {
   await group.deleteOne();
   res.json({ message: 'Group deleted successfully' });
 });
+
+// @desc    Mark a group as settled (any member)
+// @route   PATCH /api/groups/:id/settle
+// @access  Private
+export const markGroupAsSettled = asyncHandler(async (req, res) => {
+  const group = await Group.findById(req.params.id);
+
+  if (!group) {
+    res.status(404);
+    throw new Error('Group not found');
+  }
+
+  const isMember = group.members.some(
+    (m) => m.toString() === req.user._id.toString()
+  );
+  if (!isMember) {
+    res.status(403);
+    throw new Error('Only members can update this group');
+  }
+
+  group.status = req.body.status === 'active' ? 'active' : 'settled';
+  await group.save();
+
+  const populated = await group.populate([
+    { path: 'members', select: 'name email' },
+    { path: 'createdBy', select: 'name email' },
+  ]);
+  res.json(populated);
+});
