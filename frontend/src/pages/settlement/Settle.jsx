@@ -3,11 +3,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, History, IndianRupee, Clock, CheckCircle2, 
-  ArrowRight, Loader2, AlertCircle 
+  ArrowRight, Loader2, AlertCircle, Trash2, BadgeCheck, RotateCcw
 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar.jsx';
 import { getSettlements } from '../../services/settlementService.js';
 import { getGroupBalance } from '../../services/balanceService.js';
+import { markGroupAsSettled, deleteGroup } from '../../services/groupService.js';
 import SettleModal from '../../components/settlement/SettleModal.jsx';
 import BalanceCard from '../../components/balance/BalanceCard.jsx';
 import { toast } from '../../components/common/Toast.jsx';
@@ -21,6 +22,9 @@ export default function Settle() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeSettlement, setActiveSettlement] = useState(null);
+  const [groupStatus, setGroupStatus] = useState('active'); // 'active' | 'settled'
+  const [isMarkingSettled, setIsMarkingSettled] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const currentUserId = (() => {
     try { return JSON.parse(localStorage.getItem('user') || '{}')._id; }
@@ -37,6 +41,7 @@ export default function Settle() {
       ]);
       setBalances(balanceData);
       setHistory(historyData);
+      if (balanceData?.group?.status) setGroupStatus(balanceData.group.status);
     } catch (err) {
       setError(err.message || 'Failed to load settlement data');
       toast(err.message || 'Error loading data', 'error');
@@ -44,6 +49,45 @@ export default function Settle() {
       setLoading(false);
     }
   }, [groupId]);
+
+  const handleMarkSettled = async () => {
+    setIsMarkingSettled(true);
+    try {
+      await markGroupAsSettled(groupId, 'settled');
+      setGroupStatus('settled');
+      toast('Group marked as settled! 🎉', 'success');
+    } catch (err) {
+      toast(err.message || 'Failed to mark settled', 'error');
+    } finally {
+      setIsMarkingSettled(false);
+    }
+  };
+
+  const handleReactivate = async () => {
+    setIsMarkingSettled(true);
+    try {
+      await markGroupAsSettled(groupId, 'active');
+      setGroupStatus('active');
+      toast('Group reactivated', 'success');
+    } catch (err) {
+      toast(err.message || 'Failed to reactivate', 'error');
+    } finally {
+      setIsMarkingSettled(false);
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    if (!window.confirm('Delete this group permanently? This cannot be undone.')) return;
+    setIsDeleting(true);
+    try {
+      await deleteGroup(groupId);
+      toast('Group deleted successfully', 'success');
+      navigate('/groups');
+    } catch (err) {
+      toast(err.message || 'Failed to delete group', 'error');
+      setIsDeleting(false);
+    }
+  };
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -97,10 +141,53 @@ export default function Settle() {
           </h2>
           
           <div className="space-y-3">
+          {/* All Settled Banner */}
             {mySettlements.length === 0 && otherSettlements.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[#334155] p-10 text-center">
-                <CheckCircle2 className="w-8 h-8 text-emerald-500/20 mx-auto mb-3" />
-                <p className="text-[#64748B] text-sm">Everyone is all settled up!</p>
+              <div className="flex flex-col gap-4">
+                <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-8 text-center">
+                  <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+                  <h3 className="text-lg font-bold text-emerald-300 mb-1">Everyone is all settled up!</h3>
+                  <p className="text-sm text-[#94A3B8]">No pending payments in this group.</p>
+                </div>
+
+                {/* Settled / Delete Actions */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {groupStatus !== 'settled' ? (
+                    <button
+                      onClick={handleMarkSettled}
+                      disabled={isMarkingSettled}
+                      className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-500 transition-all active:scale-95 disabled:opacity-60 shadow-lg shadow-emerald-500/20"
+                    >
+                      {isMarkingSettled ? <Loader2 className="w-4 h-4 animate-spin" /> : <BadgeCheck className="w-4 h-4" />}
+                      Mark Group as Settled
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleReactivate}
+                      disabled={isMarkingSettled}
+                      className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-500 transition-all active:scale-95 disabled:opacity-60"
+                    >
+                      {isMarkingSettled ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+                      Reactivate Group
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleDeleteGroup}
+                    disabled={isDeleting}
+                    className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 font-bold text-sm hover:bg-rose-500/20 transition-all active:scale-95 disabled:opacity-60"
+                  >
+                    {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                    Delete Group
+                  </button>
+                </div>
+
+                {groupStatus === 'settled' && (
+                  <div className="flex items-center gap-2 justify-center">
+                    <BadgeCheck className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">This group is marked as settled</span>
+                  </div>
+                )}
               </div>
             ) : (
               <>
