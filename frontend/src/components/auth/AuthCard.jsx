@@ -100,7 +100,7 @@ export default function AuthCard({ tab, setTab }) {
     setError('');
     setLoading(true);
 
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
+    const endpoint = isLogin ? '/auth/login' : '/auth/signup';
     const payload = isLogin ? { email, password } : { name, email, password };
 
     try {
